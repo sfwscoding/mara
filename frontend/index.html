@@ -127,12 +127,12 @@
         async function loadStudents() {
             const container = document.getElementById('student-list-container');
             try {
-                const response = await fetch('${BACKEND_URL}/api/students');
+                const response = await fetch(`${BACKEND_URL}/api/students`);
                 if (!response.ok) throw new Error('Network response was not ok');
                 
                 const students = await response.json();
                 
-                container.innerHTML = ''; // เคลียร์ข้อความ "กำลังโหลด..."
+                container.innerHTML = 'เข้าลูป ครับ'; // เคลียร์ข้อความ "กำลังโหลด..."
 
                 // วนลูปสร้างการ์ดนักเรียน
                 students.forEach(student => {
