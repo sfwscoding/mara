@@ -8,7 +8,7 @@ app = FastAPI()
 # ให้ใส่ URL ของ Frontend ที่จะได้หลังจาก Deploy (หรือใส่ * ไปก่อนตอนทดสอบ)
 # -----------------------------------------------------------------
 origins = [
-    "frontend-eta-one-otqawr9y18.vercel.app",  # เช่น https://my-frontend.vercel.app
+    "https://frontend-eta-one-otqawr9y18.vercel.app",  # เช่น https://my-frontend.vercel.app
    # "http://localhost:5500",     # สำหรับทดสอบบนเครื่อง
    # "http://127.0.0.1:5500",     # สำหรับทดสอบบนเครื่อง
 ]
