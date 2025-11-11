@@ -127,7 +127,7 @@
         async function loadStudents() {
             const container = document.getElementById('student-list-container');
             try {
-                const response = await fetch(`${BACKEND_URL}/api/students`);
+                const response = await fetch('${BACKEND_URL}/api/students');
                 if (!response.ok) throw new Error('Network response was not ok');
                 
                 const students = await response.json();
