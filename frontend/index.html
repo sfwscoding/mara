@@ -1,40 +1,231 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frontend Page</title>
+    <title>บันทึกผลการเรียน</title>
+
+    <style>
+        /* --- 1. CSS (ส่วนตกแต่ง) --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 600px; /* จำกัดความกว้างสำหรับหน้าจอมือถือ/แท็บเล็ต */
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        /* การ์ดนักเรียน */
+        .student-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px; /* ช่องว่างระหว่าง items */
+        }
+
+        /* รูปนักเรียน (วงกลม) */
+        .student-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%; /* ทำให้เป็นวงกลม */
+            object-fit: cover; /* ป้องกันรูปบิดเบี้ยว */
+            border: 2px solid #eee;
+        }
+
+        .student-info {
+            flex-grow: 1; /* ให้ส่วนข้อมูลขยายเต็มพื้นที่ */
+        }
+
+        .student-info h3 {
+            margin: 0 0 4px 0;
+            color: #111;
+        }
+
+        .student-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* ฟอร์มส่งคะแนน */
+        .score-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 100px;
+        }
+
+        .score-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box; /* ทำให้ padding ไม่ล้น */
+            text-align: center;
+            font-size: 1em;
+        }
+
+        /* ปุ่มส่งงาน */
+        .submit-button {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+        
+        #status-message {
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Frontend (HTML)</h1>
-    <button id="fetchButton">กดเพื่อดึงข้อมูลจาก Backend</button>
-    <pre id="result"></pre>
+
+    <div class="container">
+        <h1>แอปบันทึกผลการเรียน</h1>
+        
+        <div id="student-list-container">
+            <p style="text-align: center;">กำลังโหลดข้อมูลนักเรียน...</p>
+        </div>
+    </div>
+
 
     <script>
-        document.getElementById('fetchButton').addEventListener('click', async () => {
-            const resultElement = document.getElementById('result');
-            resultElement.textContent = 'กำลังโหลด...';
+        // --- 2. JavaScript (ส่วนการทำงาน) ---
 
+        // ⚠️⚠️ อัปเดต URL นี้ หลัง Deploy Backend ⚠️⚠️
+        const BACKEND_URL = 'https://backend-nine-mu-48.vercel.app/'; 
+
+        // ฟังก์ชันที่ทำงานเมื่อหน้าเว็บโหลดเสร็จ
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStudents();
+        });
+
+        // 1. ฟังก์ชันดึงรายชื่อนักเรียนจาก Backend
+        async function loadStudents() {
+            const container = document.getElementById('student-list-container');
             try {
-                // ---------------------------------------------------
-                // ⚠️ สำคัญ: ใส่ URL ของ Backend ที่ Deploy แล้ว
-                // ---------------------------------------------------
-                const backendUrl = 'https://backend-nine-mu-48.vercel.app'; // เช่น https://my-backend.vercel.app
+                const response = await fetch(`${BACKEND_URL}/api/students`);
+                if (!response.ok) throw new Error('Network response was not ok');
                 
-                const response = await fetch(`${backendUrl}/api/data`);
+                const students = await response.json();
                 
-                if (!response.ok) {
-                    throw new Error(`น่าจะ HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                resultElement.textContent = JSON.stringify(data, null, 2);
+                container.innerHTML = ''; // เคลียร์ข้อความ "กำลังโหลด..."
+
+                // วนลูปสร้างการ์ดนักเรียน
+                students.forEach(student => {
+                    const card = createStudentCard(student);
+                    container.appendChild(card);
+                });
 
             } catch (error) {
                 console.error('Fetch error:', error);
-                resultElement.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+                container.innerHTML = '<p style="text-align: center; color: red;">ไม่สามารถโหลดข้อมูลได้</p>';
             }
-        });
+        }
+
+        // 2. ฟังก์ชันสร้างการ์ดนักเรียน (HTML)
+        function createStudentCard(student) {
+            const card = document.createElement('div');
+            card.className = 'student-card';
+            
+            card.innerHTML = `
+                <img src="${student.image_url}" alt="รูปนักเรียน" class="student-image">
+                
+                <div class="student-info">
+                    <h3>${student.first_name} ${student.last_name}</h3>
+                    <p>ชื่อเล่น: ${student.nickname}</p>
+                </div>
+                
+                <div class="score-form">
+                    <input type="number" class="score-input" id="score-input-${student.id}" placeholder="คะแนน">
+                    <button class="submit-button" data-student-id="${student.id}">ส่งงาน</button>
+                    <div id="status-message-${student.id}" class="status-message"></div>
+                </div>
+            `;
+
+            // 3. เพิ่ม Event Listener ให้ปุ่ม "ส่งงาน" ของแต่ละคน
+            const submitButton = card.querySelector('.submit-button');
+            submitButton.addEventListener('click', () => {
+                const studentId = submitButton.getAttribute('data-student-id');
+                const scoreInput = card.querySelector(`#score-input-${student.id}`);
+                const score = parseFloat(scoreInput.value);
+
+                if (isNaN(score) || score < 0) {
+                    alert('กรุณาป้อนคะแนนให้ถูกต้อง');
+                    return;
+                }
+                
+                submitScore(studentId, score, submitButton);
+            });
+
+            return card;
+        }
+
+        // 4. ฟังก์ชันส่งคะแนนไปที่ Backend
+        async function submitScore(studentId, score, button) {
+            const statusMessage = document.getElementById(`status-message-${studentId}`);
+            button.disabled = true; // ปิดปุ่มชั่วคราว
+            statusMessage.textContent = 'กำลังส่ง...';
+            statusMessage.style.color = 'blue';
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/submit_score`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        student_id: parseInt(studentId),
+                        score: score
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    console.log('Success:', result);
+                    statusMessage.textContent = 'บันทึกแล้ว!';
+                    statusMessage.style.color = 'green';
+                } else {
+                    throw new Error(result.message || 'Error submitting score');
+                }
+
+            } catch (error) {
+                console.error('Submit error:', error);
+                statusMessage.textContent = 'ผิดพลาด';
+                statusMessage.style.color = 'red';
+            } finally {
+                // เปิดปุ่มให้กดใหม่หลังจากผ่านไป 2 วินาที
+                setTimeout(() => {
+                    button.disabled = false;
+                    statusMessage.textContent = '';
+                }, 2000);
+            }
+        }
     </script>
+
 </body>
 </html>
