@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Page</title>
+</head>
+<body>
+    <h1>Frontend (HTML)</h1>
+    <button id="fetchButton">กดเพื่อดึงข้อมูลจาก Backend</button>
+    <pre id="result"></pre>
+
+    <script>
+        document.getElementById('fetchButton').addEventListener('click', async () => {
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = 'กำลังโหลด...';
+
+            try {
+                // ---------------------------------------------------
+                // ⚠️ สำคัญ: ใส่ URL ของ Backend ที่ Deploy แล้ว
+                // ---------------------------------------------------
+                const backendUrl = 'YOUR_BACKEND_VERCEL_URL'; // เช่น https://my-backend.vercel.app
+                
+                const response = await fetch(`${backendUrl}/api/data`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                resultElement.textContent = JSON.stringify(data, null, 2);
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                resultElement.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
