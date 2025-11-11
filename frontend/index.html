@@ -21,10 +21,10 @@
                 // ---------------------------------------------------
                 const backendUrl = 'backend-nine-mu-48.vercel.app'; // เช่น https://my-backend.vercel.app
                 
-                const response = await fetch(`${backendUrl}/api/data`);
+                const response = await fetch(`${backendUrl}/`);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`น่าจะ HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
