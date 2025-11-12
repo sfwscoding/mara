@@ -8,7 +8,7 @@ app = FastAPI()
 # 1. ⚠️ ตั้งค่า CORS (สำคัญมาก)
 # -----------------------------------------------------------------
 origins = [
-    "https://sfws.vercel.app",  # ต้องใส่ URL ของ Frontend หลัง Deploy https://frontend-eta-one-otqawr9y18.vercel.app/
+    "https://ssth.app",  # ต้องใส่ URL ของ Frontend หลัง Deploy https://frontend-eta-one-otqawr9y18.vercel.app/
     #"http://127.0.0.1:5500",     # สำหรับทดสอบ
     #"http://localhost:5500",
 ]
